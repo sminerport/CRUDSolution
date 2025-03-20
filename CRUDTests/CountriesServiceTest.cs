@@ -41,7 +41,7 @@ namespace CRUDTests
             };
 
             //Assert
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<ArgumentException>(() =>
             {
                 // Act
                 _countriesService.AddCountry(request);
@@ -64,7 +64,7 @@ namespace CRUDTests
             };
 
             //Assert
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<ArgumentException>(() =>
             {
                 // Act
                 _countriesService.AddCountry(request1);
