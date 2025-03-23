@@ -19,5 +19,12 @@ namespace ServiceContracts
         /// </summary>
         /// <returns>A list of <see cref="PersonResponse"></see> objects</returns>
         List<PersonResponse> GetAllPersons();
+
+        /// <summary>
+        /// Returns the person object based on the given person id
+        /// </summary>
+        /// <param name="personID">Person id to search</param>
+        /// <returns>Returns matching person object</returns>
+        PersonResponse? GetPersonByPersonID(Guid? personID);
     }
 }

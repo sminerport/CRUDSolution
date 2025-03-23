@@ -50,5 +50,18 @@ namespace Services
                 temp => ConvertPersonToPersonResponse(temp)
                 ).ToList();
         }
+
+        public PersonResponse? GetPersonByPersonID(Guid? personID)
+        {
+            if (personID == null)
+                return null;
+
+            Person? person = _persons.FirstOrDefault(temp => temp.PersonID == personID);
+
+            if (person == null)
+                return null;
+
+            return ConvertPersonToPersonResponse(person);
+        }
     }
 }
