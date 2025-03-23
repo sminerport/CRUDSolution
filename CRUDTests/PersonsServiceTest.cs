@@ -58,14 +58,18 @@ namespace CRUDTests
                 Email = "john_doe@example.com",
                 DateOfBirth = new DateTime(1990, 3, 15),
                 Gender = GenderOptions.Male,
-                CountryID = null,
+                CountryID = Guid.NewGuid(),
                 Address = "123, Main Street, New York",
                 ReceiveNewsLetters = true
             };
 
+            List<PersonResponse> persons_list = _personsService.GetAllPersons();
+
             // Act
-            PersonResponse response = _personsService.AddPerson(request);
-            Assert.True(response.PersonID != Guid.Empty);
+            PersonResponse person_response_from_add = _personsService.AddPerson(request);
+            Assert.True(person_response_from_add.PersonID != Guid.Empty);
+
+            Assert.Contains(person_response_from_add, persons_list);
 
             #endregion AddPerson
         }
