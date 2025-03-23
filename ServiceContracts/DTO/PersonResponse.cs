@@ -59,6 +59,11 @@ namespace ServiceContracts.DTO
                 Address,
                 ReceiveNewsLetters);
         }
+
+        public override string ToString()
+        {
+            return $"Person ID: {PersonID}, Person Name: {PersonName}, Email: {Email}, Date of Birth: {DateOfBirth?.ToString("dd MM yyyy")}, Gender: {Gender}, Country ID: {CountryID}, Address: {Address}, Receive News Letters: {ReceiveNewsLetters}";
+        }
     }
 
     public static class PersonExtensions
