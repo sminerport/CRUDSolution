@@ -1,4 +1,6 @@
-﻿using Entities;
+﻿using CRUDTests.Helpers;
+
+using Entities;
 
 using ServiceContracts;
 using ServiceContracts.DTO;
@@ -12,9 +14,15 @@ namespace CRUDTests
 {
     public class PersonsServiceTest
     {
+        #region Fields
+
         private readonly IPersonsService _personsService;
         private readonly ICountriesService _countriesService;
         private readonly ITestOutputHelper _testOutputHelper;
+
+        #endregion Fields
+
+        #region Constructor
 
         public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
@@ -22,6 +30,8 @@ namespace CRUDTests
             _countriesService = new CountriesService();
             _testOutputHelper = testOutputHelper;
         }
+
+        #endregion Constructor
 
         #region AddPerson
 
@@ -60,16 +70,7 @@ namespace CRUDTests
         public void AddPerson_ProperPersonDetails()
         {
             // Arrange
-            PersonAddRequest? request = new PersonAddRequest()
-            {
-                PersonName = "John Doe",
-                Email = "john_doe@example.com",
-                DateOfBirth = new DateTime(1990, 3, 15),
-                Gender = GenderOptions.Male,
-                CountryID = Guid.NewGuid(),
-                Address = "123, Main Street, New York",
-                ReceiveNewsLetters = true
-            };
+            PersonAddRequest request = TestDataHelper.CreateDefaultPersonAddRequest();
 
             // Act
             PersonResponse person_response_from_add = _personsService.AddPerson(request);
@@ -85,7 +86,6 @@ namespace CRUDTests
 
         #region GetPersonPersonID
 
-        // If we supply null as PersonID, we will return null as the value of the `PersonResponse` object
         [Fact]
         public void GetPersonByPersonID_NullPersonID()
         {
@@ -95,31 +95,20 @@ namespace CRUDTests
             // Act
             PersonResponse? person_response_from_get = _personsService.GetPersonByPersonID(personID);
 
+            // Assert
             Assert.Null(person_response_from_get);
         }
 
-        // If we supply a valid person, it should return the valid person details as PersonResponse object
         [Fact]
         public void GetPersonByPersonID_WithPersonID()
         {
             // Arrange
-            CountryAddRequest country_request = new CountryAddRequest()
-            {
-                CountryName = "Mexico"
-            };
+            CountryAddRequest country_request = TestDataHelper.CreateCountryAddRequest("USA");
 
             CountryResponse? country_response = _countriesService.AddCountry(country_request);
 
-            PersonAddRequest person_request = new PersonAddRequest()
-            {
-                PersonName = "John Doe",
-                Email = "john_doe@example.com",
-                DateOfBirth = new DateTime(1990, 3, 15),
-                Address = "123, Main Street, New York",
-                CountryID = country_response.CountryID,
-                Gender = GenderOptions.Male,
-                ReceiveNewsLetters = true
-            };
+            PersonAddRequest person_request = TestDataHelper.CreateDefaultPersonAddRequest(
+                countryID: country_response.CountryID);
 
             PersonResponse person_response_from_add = _personsService.AddPerson(person_request);
 
@@ -149,57 +138,17 @@ namespace CRUDTests
         public void GetAllPersons_AddFewPersons()
         {
             // Arrange
-            CountryAddRequest country_request_1 = new CountryAddRequest()
-            {
-                CountryName = "China"
-            };
-            CountryAddRequest country_request_2 = new CountryAddRequest()
-            {
-                CountryName = "India"
-            };
+            CountryAddRequest country_request_1 = TestDataHelper.CreateCountryAddRequest("USA");
+            CountryAddRequest country_request_2 = TestDataHelper.CreateCountryAddRequest("India");
 
             CountryResponse country_response_1 = _countriesService.AddCountry(country_request_1);
             CountryResponse country_response_2 = _countriesService.AddCountry(country_request_2);
 
-            PersonAddRequest person_request_1 = new PersonAddRequest()
-            {
-                PersonName = "John Doe",
-                Email = "doe@example.com",
-                DateOfBirth = new DateTime(1990, 3, 15),
-                Address = "123, Main Street, New York",
-                CountryID = country_response_1.CountryID,
-                Gender = GenderOptions.Male,
-                ReceiveNewsLetters = true
-            };
+            List<PersonAddRequest> person_requests = TestDataHelper.CreateMultipleSamplePersons(3);
 
-            PersonAddRequest person_request_2 = new PersonAddRequest()
-            {
-                PersonName = "Jane Doe",
-                Email = "jane@example.com",
-                DateOfBirth = new DateTime(1980, 7, 19),
-                Address = "456, Main Street, New York",
-                CountryID = country_response_2.CountryID,
-                Gender = GenderOptions.Female,
-                ReceiveNewsLetters = false
-            };
-
-            PersonAddRequest person_request_3 = new PersonAddRequest()
-            {
-                PersonName = "John Smith",
-                Email = "john_smith@example.com",
-                DateOfBirth = new DateTime(1970, 5, 25),
-                Address = "789, Main Street, New York",
-                CountryID = country_response_1.CountryID,
-                Gender = GenderOptions.Other,
-                ReceiveNewsLetters = true
-            };
-
-            List<PersonAddRequest> person_requests = new List<PersonAddRequest>()
-            {
-                person_request_1,
-                person_request_2,
-                person_request_3
-            };
+            person_requests[0].CountryID = country_response_1.CountryID;
+            person_requests[1].CountryID = country_response_2.CountryID;
+            person_requests[2].CountryID = country_response_1.CountryID;
 
             List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
 
@@ -243,57 +192,18 @@ namespace CRUDTests
         public void GetFilteredPersons_EmptySearchText()
         {
             // Arrange
-            CountryAddRequest country_request_1 = new CountryAddRequest()
-            {
-                CountryName = "China"
-            };
-            CountryAddRequest country_request_2 = new CountryAddRequest()
-            {
-                CountryName = "India"
-            };
+            CountryAddRequest country_request_1 = TestDataHelper.CreateCountryAddRequest("USA");
+
+            CountryAddRequest country_request_2 = TestDataHelper.CreateCountryAddRequest("India");
 
             CountryResponse country_response_1 = _countriesService.AddCountry(country_request_1);
             CountryResponse country_response_2 = _countriesService.AddCountry(country_request_2);
 
-            PersonAddRequest person_request_1 = new PersonAddRequest()
-            {
-                PersonName = "John Doe",
-                Email = "doe@example.com",
-                DateOfBirth = new DateTime(1990, 3, 15),
-                Address = "123, Main Street, New York",
-                CountryID = country_response_1.CountryID,
-                Gender = GenderOptions.Male,
-                ReceiveNewsLetters = true
-            };
+            List<PersonAddRequest> person_requests = TestDataHelper.CreateMultipleSamplePersons(3);
 
-            PersonAddRequest person_request_2 = new PersonAddRequest()
-            {
-                PersonName = "Jane Doe",
-                Email = "jane@example.com",
-                DateOfBirth = new DateTime(1980, 7, 19),
-                Address = "456, Main Street, New York",
-                CountryID = country_response_2.CountryID,
-                Gender = GenderOptions.Female,
-                ReceiveNewsLetters = false
-            };
-
-            PersonAddRequest person_request_3 = new PersonAddRequest()
-            {
-                PersonName = "John Smith",
-                Email = "john_smith@example.com",
-                DateOfBirth = new DateTime(1970, 5, 25),
-                Address = "789, Main Street, New York",
-                CountryID = country_response_1.CountryID,
-                Gender = GenderOptions.Other,
-                ReceiveNewsLetters = true
-            };
-
-            List<PersonAddRequest> person_requests = new List<PersonAddRequest>()
-            {
-                person_request_1,
-                person_request_2,
-                person_request_3
-            };
+            person_requests[0].CountryID = country_response_1.CountryID;
+            person_requests[1].CountryID = country_response_2.CountryID;
+            person_requests[2].CountryID = country_response_1.CountryID;
 
             List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
 
@@ -332,57 +242,18 @@ namespace CRUDTests
         public void GetFilteredPersons_SearchByPersonName()
         {
             // Arrange
-            CountryAddRequest country_request_1 = new CountryAddRequest()
-            {
-                CountryName = "USA"
-            };
-            CountryAddRequest country_request_2 = new CountryAddRequest()
-            {
-                CountryName = "India"
-            };
+            CountryAddRequest country_request_1 = TestDataHelper.CreateCountryAddRequest("France");
+
+            CountryAddRequest country_request_2 = TestDataHelper.CreateCountryAddRequest("Germany");
 
             CountryResponse country_response_1 = _countriesService.AddCountry(country_request_1);
             CountryResponse country_response_2 = _countriesService.AddCountry(country_request_2);
 
-            PersonAddRequest person_request_1 = new PersonAddRequest()
-            {
-                PersonName = "Mary",
-                Email = "mary@example.com",
-                DateOfBirth = new DateTime(1990, 3, 15),
-                Address = "123, Main Street, New York",
-                CountryID = country_response_1.CountryID,
-                Gender = GenderOptions.Male,
-                ReceiveNewsLetters = true
-            };
+            List<PersonAddRequest> person_requests = TestDataHelper.CreateMultipleSamplePersons(3);
 
-            PersonAddRequest person_request_2 = new PersonAddRequest()
-            {
-                PersonName = "Smith",
-                Email = "smith@example.com",
-                DateOfBirth = new DateTime(1980, 7, 19),
-                Address = "456, Main Street, New York (Smith)",
-                CountryID = country_response_2.CountryID,
-                Gender = GenderOptions.Female,
-                ReceiveNewsLetters = false
-            };
-
-            PersonAddRequest person_request_3 = new PersonAddRequest()
-            {
-                PersonName = "Rahman",
-                Email = "rahman@example.com",
-                DateOfBirth = new DateTime(1970, 5, 25),
-                Address = "789, Main Street, New York (Rahman)",
-                CountryID = country_response_1.CountryID,
-                Gender = GenderOptions.Other,
-                ReceiveNewsLetters = true
-            };
-
-            List<PersonAddRequest> person_requests = new List<PersonAddRequest>()
-            {
-                person_request_1,
-                person_request_2,
-                person_request_3
-            };
+            person_requests[0].CountryID = country_response_1.CountryID;
+            person_requests[1].CountryID = country_response_2.CountryID;
+            person_requests[2].CountryID = country_response_1.CountryID;
 
             List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
 
@@ -394,6 +265,7 @@ namespace CRUDTests
 
             // print person_response_list_from_add
             _testOutputHelper.WriteLine("Expected: ");
+
             foreach (PersonResponse person_response_from_add in person_response_list_from_add)
             {
                 _testOutputHelper.WriteLine(person_response_from_add.ToString());
@@ -404,6 +276,7 @@ namespace CRUDTests
 
             // print persons_list_from_search
             _testOutputHelper.WriteLine("Actual: ");
+
             foreach (PersonResponse person_from_search in persons_list_from_search)
             {
                 _testOutputHelper.WriteLine(person_from_search.ToString());
@@ -413,9 +286,13 @@ namespace CRUDTests
             foreach (PersonResponse person_response_from_add in person_response_list_from_add)
             {
                 if (!string.IsNullOrEmpty(person_response_from_add.PersonName)
-                    && person_response_from_add.PersonName.Contains("ma", StringComparison.OrdinalIgnoreCase))
+                    && person_response_from_add.PersonName.Contains(
+                    value: "ma",
+                    comparisonType: StringComparison.OrdinalIgnoreCase))
                 {
-                    Assert.Contains(person_response_from_add, persons_list_from_search);
+                    Assert.Contains(
+                        expected: person_response_from_add,
+                        collection: persons_list_from_search);
                 }
             }
         }
