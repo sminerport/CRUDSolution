@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceContracts.Enums
 {
-    public enum SortOrderEnum
+    public enum SortOrderOptions
     {
         ASC,
         DESC

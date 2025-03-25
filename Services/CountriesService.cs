@@ -9,9 +9,39 @@ namespace Services
     {
         private readonly List<Country> _countries;
 
-        public CountriesService()
+        public CountriesService(bool initialize = true)
         {
             _countries = new List<Country>();
+            if (initialize)
+            {
+                _countries.AddRange(new List<Country>() {
+                    new Country()
+                    {
+                        CountryID = Guid.Parse("1B984A3C-0F58-4A52-A1C4-5AF3D061E285"),
+                        CountryName = "USA"
+                    },
+                    new Country()
+                    {
+                        CountryID = Guid.Parse("F7416243-E291-4ED6-9B51-CA0546B894F0"),
+                        CountryName = "Canada"
+                    },
+                    new Country()
+                    {
+                        CountryID = Guid.Parse("5D1F3C1E-9222-4262-9480-A4170FEB589B"),
+                        CountryName = "Mexico"
+                    },
+                    new Country()
+                    {
+                        CountryID = Guid.Parse("151F8B77-A4CC-4948-A360-DD4DE7912E3D"),
+                        CountryName = "Brazil"
+                    },
+                    new Country()
+                    {
+                        CountryID = Guid.Parse("9D3A7C28-17AA-43DA-AAD7-D1EDBE625D47"),
+                        CountryName = "Argentina"
+                    }
+                });
+            }
         }
 
         public CountryResponse AddCountry(CountryAddRequest? countryAddRequest)

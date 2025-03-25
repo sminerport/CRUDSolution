@@ -10,14 +10,128 @@ namespace Services
 {
     public class PersonsService : IPersonsService
     {
-        private readonly List<Person> _persons;
+        #region Fields
+
+        private List<Person> _persons;
         private readonly ICountriesService _countriesService;
 
-        public PersonsService()
+        #endregion Fields
+
+        #region Constructors
+
+        public PersonsService(bool initialize = true)
         {
             _persons = new List<Person>();
             _countriesService = new CountriesService();
+
+            if (initialize)
+            {
+                _persons.AddRange(
+                new Person()
+                {
+                    PersonID = Guid.Parse("75415A1C-90AE-44D3-BBA1-D1889C101180"),
+                    PersonName = "Guendolen",
+                    Email = "ggavaran0@who.int",
+                    DateOfBirth = DateTime.Parse("1990-11-03"),
+                    Gender = "Female",
+                    CountryID = Guid.Parse("1B984A3C-0F58-4A52-A1C4-5AF3D061E285"),
+                    Address = "1 La Follette Street",
+                    ReceiveNewsLetters = false
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("901A574E-3AC8-49D9-B72D-C1639F580F90"),
+                    PersonName = "Arthur",
+                    Email = "adrance2@admin.ch",
+                    DateOfBirth = DateTime.Parse("2000-11-25"),
+                    Gender = "Male",
+                    CountryID = Guid.Parse("F7416243-E291-4ED6-9B51-CA0546B894F0"),
+                    Address = "29412 Declaration Circle",
+                    ReceiveNewsLetters = false
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("FF2459AD-2087-4F3E-B4DA-03CCACC4327D"),
+                    PersonName = "Ignace",
+                    Email = "ienevold3@ftc.gov",
+                    DateOfBirth = DateTime.Parse("1999-12-31"),
+                    Gender = "Male",
+                    CountryID = Guid.Parse("5D1F3C1E-9222-4262-9480-A4170FEB589B"),
+                    Address = "01155 Northridge Park",
+                    ReceiveNewsLetters = true
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("528761BB-B1BC-4E34-91CF-A5A61B7BBECF"),
+                    PersonName = "Christina",
+                    Email = "cdurham4@hud.gov",
+                    DateOfBirth = DateTime.Parse("1992-02-02"),
+                    Gender = "Female",
+                    CountryID = Guid.Parse("151F8B77-A4CC-4948-A360-DD4DE7912E3D"),
+                    Address = "50 Donald Street",
+                    ReceiveNewsLetters = false
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("70BB0CE5-C600-4507-A75E-2FC528D56831"),
+                    PersonName = "Fons",
+                    Email = "dlandeg7@cdbaby.com",
+                    DateOfBirth = DateTime.Parse("1998-05-27"),
+                    Gender = "Male",
+                    CountryID = Guid.Parse("9D3A7C28-17AA-43DA-AAD7-D1EDBE625D47"),
+                    Address = "8931 Esker Hill",
+                    ReceiveNewsLetters = false
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("FF2459AD-2087-4F3E-B4DA-03CCACC4327D"),
+                    PersonName = "Davin",
+                    Email = "dlandeg7@cdbaby.com",
+                    DateOfBirth = DateTime.Parse("1992-03-15"),
+                    Gender = "Male",
+                    CountryID = Guid.Parse("5D1F3C1E-9222-4262-9480-A4170FEB589B"),
+                    Address = "9 Cody Parkway",
+                    ReceiveNewsLetters = true
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("528761BB-B1BC-4E34-91CF-A5A61B7BBECF"),
+                    PersonName = "Jeralee",
+                    Email = "jklesse8@hp.com",
+                    DateOfBirth = DateTime.Parse("1995-03-05"),
+                    Gender = "Other",
+                    CountryID = Guid.Parse("151F8B77-A4CC-4948-A360-DD4DE7912E3D"),
+                    Address = "58498 Crest Line Drive",
+                    ReceiveNewsLetters = false
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("70BB0CE5-C600-4507-A75E-2FC528D56831"),
+                    PersonName = "Shelden",
+                    Email = "sneary9@geocities.jp",
+                    DateOfBirth = DateTime.Parse("1992-08-11"),
+                    Gender = "Male",
+                    CountryID = Guid.Parse("9D3A7C28-17AA-43DA-AAD7-D1EDBE625D47"),
+                    Address = "0 Heffernan Center",
+                    ReceiveNewsLetters = true
+                },
+                new Person()
+                {
+                    PersonID = Guid.Parse("B417D4F7-5C94-427E-9E06-E9955C5A3EB1"),
+                    PersonName = "Sigfried",
+                    Email = "stryhorn6@ucsd.edu",
+                    DateOfBirth = DateTime.Parse("1993-06-10"),
+                    Gender = "Male",
+                    CountryID = Guid.Parse("1B984A3C-0F58-4A52-A1C4-5AF3D061E285"),
+                    Address = "5 Sauthoff Lane",
+                    ReceiveNewsLetters = true
+                });
+            }
         }
+
+        #endregion Constructors
+
+        #region Convert Methods
 
         private PersonResponse ConvertPersonToPersonResponse(Person person)
         {
@@ -25,6 +139,10 @@ namespace Services
             personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName;
             return personResponse;
         }
+
+        #endregion Convert Methods
+
+        #region Add Methods
 
         public PersonResponse AddPerson(PersonAddRequest? personAddRequest)
         {
@@ -44,6 +162,10 @@ namespace Services
 
             return ConvertPersonToPersonResponse(person);
         }
+
+        #endregion Add Methods
+
+        #region Get Methods
 
         public List<PersonResponse> GetAllPersons()
         {
@@ -124,9 +246,99 @@ namespace Services
         public List<PersonResponse> GetSortedPersons(
             List<PersonResponse> allPersons,
             string sortBy,
-            SortOrderEnum sortOrder)
+            SortOrderOptions sortOrder)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(sortBy))
+                return allPersons;
+
+            List<PersonResponse> sortedPersons = (sortBy, sortOrder) switch
+            {
+                (nameof(PersonResponse.PersonName), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.PersonName), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Email), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Email), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName).ToList(),
+
+                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName).ToList(),
+
+                (nameof(PersonResponse.Age), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Age), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Gender), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Gender), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Country), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Country), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Address), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.Address), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+
+                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName).ToList(),
+
+                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName).ToList(),
+
+                _ => allPersons
+            };
+
+            return sortedPersons;
         }
+
+        #endregion Get Methods
+
+        #region Update Methods
+
+        public PersonResponse UpdatePerson(PersonUpdateRequest? personUpdateRequest)
+        {
+            if (personUpdateRequest == null)
+                throw new ArgumentNullException(nameof(personUpdateRequest));
+
+            ValidationHelper.ModelValidation(personUpdateRequest);
+
+            Person? matchingPerson = _persons.FirstOrDefault(temp => temp.PersonID == personUpdateRequest.PersonID);
+
+            if (matchingPerson == null)
+                throw new ArgumentException("Person not found");
+
+            matchingPerson.PersonName = personUpdateRequest.PersonName;
+            matchingPerson.Email = personUpdateRequest.Email;
+            matchingPerson.DateOfBirth = personUpdateRequest.DateOfBirth;
+            matchingPerson.Gender = personUpdateRequest.Gender.ToString();
+            matchingPerson.CountryID = personUpdateRequest.CountryID;
+            matchingPerson.Address = personUpdateRequest.Address;
+            matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
+
+            return matchingPerson.ToPersonResponse();
+        }
+
+        #endregion Update Methods
+
+        #region Delete Methods
+
+        public bool DeletePerson(Guid? personID)
+        {
+            if (personID == null)
+            {
+                throw new ArgumentNullException(nameof(personID));
+            }
+
+            Person? person = _persons.FirstOrDefault(temp => temp.PersonID == personID);
+
+            if (person == null)
+                return false;
+
+            _persons.RemoveAll(temp => temp.PersonID == personID);
+
+            return true;
+        }
+
+        #endregion Delete Methods
     }
 }
