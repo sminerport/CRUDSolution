@@ -75,7 +75,7 @@ namespace Services
                 {
                     PersonID = Guid.Parse("70BB0CE5-C600-4507-A75E-2FC528D56831"),
                     PersonName = "Fons",
-                    Email = "dlandeg7@cdbaby.com",
+                    Email = "fjsanse9@cdbaby.com",
                     DateOfBirth = DateTime.Parse("1998-05-27"),
                     Gender = "Male",
                     CountryID = Guid.Parse("9D3A7C28-17AA-43DA-AAD7-D1EDBE625D47"),
@@ -86,7 +86,7 @@ namespace Services
                 {
                     PersonID = Guid.Parse("FF2459AD-2087-4F3E-B4DA-03CCACC4327D"),
                     PersonName = "Davin",
-                    Email = "dlandeg7@cdbaby.com",
+                    Email = "dlandeg7@git.com",
                     DateOfBirth = DateTime.Parse("1992-03-15"),
                     Gender = "Male",
                     CountryID = Guid.Parse("5D1F3C1E-9222-4262-9480-A4170FEB589B"),
@@ -169,8 +169,8 @@ namespace Services
 
         public List<PersonResponse> GetAllPersons()
         {
-            return _persons.Select(temp => temp.ToPersonResponse())
-                           .ToList();
+            return _persons.Select(temp => ConvertPersonToPersonResponse(temp))
+                .ToList();
         }
 
         public PersonResponse? GetPersonByPersonID(Guid? personID)
@@ -183,12 +183,12 @@ namespace Services
             if (person == null)
                 return null;
 
-            return person.ToPersonResponse();
+            return ConvertPersonToPersonResponse(person);
         }
 
         public List<PersonResponse> GetFilteredPersons(
             string searchBy,
-            string searchString)
+            string? searchString)
         {
             List<PersonResponse> allPersons = GetAllPersons();
             List<PersonResponse> matchingPersons = allPersons;
@@ -198,38 +198,38 @@ namespace Services
 
             switch (searchBy)
             {
-                case nameof(Person.PersonName):
+                case nameof(PersonResponse.PersonName):
                     matchingPersons = allPersons.Where(temp => (!string.IsNullOrEmpty(temp.PersonName) ? temp.PersonName.Contains(
                         searchString,
                         StringComparison.OrdinalIgnoreCase) : true)).ToList();
                     break;
 
-                case nameof(Person.Email):
+                case nameof(PersonResponse.Email):
                     matchingPersons = allPersons.Where(temp => (!string.IsNullOrEmpty(temp.Email) ? temp.Email.Contains(
                         searchString,
                         StringComparison.OrdinalIgnoreCase) : true)).ToList();
                     break;
 
-                case nameof(Person.DateOfBirth):
+                case nameof(PersonResponse.DateOfBirth):
                     matchingPersons = allPersons.Where(temp => (temp.DateOfBirth != null) ? temp.DateOfBirth.Value.ToString("MM dd yyyy").Contains(
                         searchString,
                         StringComparison.OrdinalIgnoreCase) : true).ToList();
                     break;
 
-                case nameof(Person.Gender):
+                case nameof(PersonResponse.Gender):
                     matchingPersons = allPersons.Where(temp => (!string.IsNullOrEmpty(temp.Gender) ? temp.Gender.Contains(
                         searchString,
                         StringComparison.OrdinalIgnoreCase) : true)).ToList();
                     break;
 
-                case nameof(Person.CountryID):
+                case nameof(PersonResponse.CountryID):
                     matchingPersons = allPersons.Where(temp => (!string.IsNullOrEmpty(temp.Country) ?
                     temp.Country.Contains(
                         searchString,
                         StringComparison.OrdinalIgnoreCase) : true)).ToList();
                     break;
 
-                case nameof(Person.Address):
+                case nameof(PersonResponse.Address):
                     matchingPersons = allPersons.Where(temp => (!string.IsNullOrEmpty(temp.Address) ? temp.Address.Contains(
                         searchString,
                         StringComparison.OrdinalIgnoreCase) : true)).ToList();
@@ -257,33 +257,33 @@ namespace Services
 
                 (nameof(PersonResponse.PersonName), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.Email), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Email), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Email, StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.Email), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Email), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Email, StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName).ToList(),
+                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.DateOfBirth).ToList(),
 
-                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName).ToList(),
+                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.DateOfBirth).ToList(),
 
-                (nameof(PersonResponse.Age), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Age), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Age).ToList(),
 
-                (nameof(PersonResponse.Age), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Age), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Age).ToList(),
 
-                (nameof(PersonResponse.Gender), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Gender), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Gender?.ToString(), StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.Gender), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Gender), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Gender?.ToString(), StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.Country), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Country), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Country, StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.Country), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Country), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Country, StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.Address), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Address), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Address, StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.Address), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
+                (nameof(PersonResponse.Address), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Address, StringComparer.OrdinalIgnoreCase).ToList(),
 
-                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName).ToList(),
+                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.ReceiveNewsLetters).ToList(),
 
-                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName).ToList(),
+                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.ReceiveNewsLetters).ToList(),
 
                 _ => allPersons
             };
@@ -315,7 +315,7 @@ namespace Services
             matchingPerson.Address = personUpdateRequest.Address;
             matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
-            return matchingPerson.ToPersonResponse();
+            return ConvertPersonToPersonResponse(matchingPerson);
         }
 
         #endregion Update Methods
