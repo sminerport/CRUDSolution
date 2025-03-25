@@ -27,7 +27,7 @@ namespace CRUDExample.Controllers
 
         #endregion Constructors
 
-        #region Methods
+        #region Index Actions
 
         [Route("[action]")]
         [Route("/")]
@@ -59,8 +59,12 @@ namespace CRUDExample.Controllers
             return View(sortedPersons);  // Views/Persons/Index.cshtml
         }
 
-        [Route("[action]")]
+        #endregion Index Actions
+
+        #region Create Actions
+
         [HttpGet]
+        [Route("[action]")]
         public IActionResult Create()
         {
             List<CountryResponse> countries = _countriesService.GetAllCountries();
@@ -86,6 +90,10 @@ namespace CRUDExample.Controllers
 
             return RedirectToAction("Index", "Persons");
         }
+
+        #endregion Create Actions
+
+        #region Edit Actions
 
         [HttpGet]
         [Route("[action]/{personID}")]
@@ -132,10 +140,39 @@ namespace CRUDExample.Controllers
 
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
 
-                return View();
+                return View(personResponse.ToPersonUpdateRequest());
             }
         }
 
-        #endregion Methods
+        #endregion Edit Actions
+
+        #region Delete Actions
+
+        [HttpGet]
+        [Route("[action]/{personID}")]
+        public IActionResult Delete(Guid? personID)
+        {
+            PersonResponse? personResponse = _personsService.GetPersonByPersonID(personID);
+            if (personResponse == null)
+                return RedirectToAction("Index");
+
+            return View(personResponse);
+        }
+
+        [HttpPost]
+        [Route("[action]/{personID}")]
+        public IActionResult Delete(PersonUpdateRequest personUpdateRequest)
+        {
+            PersonResponse? personResponse = _personsService.GetPersonByPersonID(personUpdateRequest.PersonID);
+
+            if (personResponse == null)
+                return RedirectToAction("Index");
+
+            _personsService.DeletePerson(personUpdateRequest.PersonID);
+
+            return RedirectToAction("Index");
+        }
+
+        #endregion Delete Actions
     }
 }
