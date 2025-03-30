@@ -1,4 +1,13 @@
-﻿using Entities;
+﻿using System.Globalization;
+
+using CsvHelper;
+using CsvHelper.Configuration;
+
+using Entities;
+
+using Microsoft.EntityFrameworkCore;
+
+using OfficeOpenXml;
 
 using ServiceContracts;
 using ServiceContracts.DTO;
@@ -12,139 +21,26 @@ namespace Services
     {
         #region Fields
 
-        private List<Person> _persons;
+        private PersonsDbContext _db;
         private readonly ICountriesService _countriesService;
 
         #endregion Fields
 
         #region Constructors
 
-        public PersonsService(bool initialize = true)
+        public PersonsService(
+            PersonsDbContext personDbContext,
+            ICountriesService countriesService)
         {
-            _persons = new List<Person>();
-            _countriesService = new CountriesService();
-
-            if (initialize)
-            {
-                _persons.AddRange(
-                new Person()
-                {
-                    PersonID = Guid.Parse("75415A1C-90AE-44D3-BBA1-D1889C101180"),
-                    PersonName = "Guendolen",
-                    Email = "ggavaran0@who.int",
-                    DateOfBirth = DateTime.Parse("1990-11-03"),
-                    Gender = "Female",
-                    CountryID = Guid.Parse("1B984A3C-0F58-4A52-A1C4-5AF3D061E285"),
-                    Address = "1 La Follette Street",
-                    ReceiveNewsLetters = false
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("901A574E-3AC8-49D9-B72D-C1639F580F90"),
-                    PersonName = "Arthur",
-                    Email = "adrance2@admin.ch",
-                    DateOfBirth = DateTime.Parse("2000-11-25"),
-                    Gender = "Male",
-                    CountryID = Guid.Parse("F7416243-E291-4ED6-9B51-CA0546B894F0"),
-                    Address = "29412 Declaration Circle",
-                    ReceiveNewsLetters = false
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("FF2459AD-2087-4F3E-B4DA-03CCACC4327D"),
-                    PersonName = "Ignace",
-                    Email = "ienevold3@ftc.gov",
-                    DateOfBirth = DateTime.Parse("1999-12-31"),
-                    Gender = "Male",
-                    CountryID = Guid.Parse("5D1F3C1E-9222-4262-9480-A4170FEB589B"),
-                    Address = "01155 Northridge Park",
-                    ReceiveNewsLetters = true
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("528761BB-B1BC-4E34-91CF-A5A61B7BBECF"),
-                    PersonName = "Christina",
-                    Email = "cdurham4@hud.gov",
-                    DateOfBirth = DateTime.Parse("1992-02-02"),
-                    Gender = "Female",
-                    CountryID = Guid.Parse("151F8B77-A4CC-4948-A360-DD4DE7912E3D"),
-                    Address = "50 Donald Street",
-                    ReceiveNewsLetters = false
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("70BB0CE5-C600-4507-A75E-2FC528D56831"),
-                    PersonName = "Fons",
-                    Email = "fjsanse9@cdbaby.com",
-                    DateOfBirth = DateTime.Parse("1998-05-27"),
-                    Gender = "Male",
-                    CountryID = Guid.Parse("9D3A7C28-17AA-43DA-AAD7-D1EDBE625D47"),
-                    Address = "8931 Esker Hill",
-                    ReceiveNewsLetters = false
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("B742FC5A-8039-4E3F-BB90-59581239EC40"),
-                    PersonName = "Davin",
-                    Email = "dlandeg7@git.com",
-                    DateOfBirth = DateTime.Parse("1992-03-15"),
-                    Gender = "Male",
-                    CountryID = Guid.Parse("5D1F3C1E-9222-4262-9480-A4170FEB589B"),
-                    Address = "9 Cody Parkway",
-                    ReceiveNewsLetters = true
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("A7FBB0F0-C913-44EF-8914-F87D81ED66C7"),
-                    PersonName = "Jeralee",
-                    Email = "jklesse8@hp.com",
-                    DateOfBirth = DateTime.Parse("1995-03-05"),
-                    Gender = "Other",
-                    CountryID = Guid.Parse("151F8B77-A4CC-4948-A360-DD4DE7912E3D"),
-                    Address = "58498 Crest Line Drive",
-                    ReceiveNewsLetters = false
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("BB115169-D6AA-4883-8EA4-E69905756195"),
-                    PersonName = "Shelden",
-                    Email = "sneary9@geocities.jp",
-                    DateOfBirth = DateTime.Parse("1992-08-11"),
-                    Gender = "Male",
-                    CountryID = Guid.Parse("9D3A7C28-17AA-43DA-AAD7-D1EDBE625D47"),
-                    Address = "0 Heffernan Center",
-                    ReceiveNewsLetters = true
-                },
-                new Person()
-                {
-                    PersonID = Guid.Parse("B417D4F7-5C94-427E-9E06-E9955C5A3EB1"),
-                    PersonName = "Sigfried",
-                    Email = "stryhorn6@ucsd.edu",
-                    DateOfBirth = DateTime.Parse("1993-06-10"),
-                    Gender = "Male",
-                    CountryID = Guid.Parse("1B984A3C-0F58-4A52-A1C4-5AF3D061E285"),
-                    Address = "5 Sauthoff Lane",
-                    ReceiveNewsLetters = true
-                });
-            }
+            _db = personDbContext;
+            _countriesService = countriesService;
         }
 
         #endregion Constructors
 
-        #region Convert Methods
-
-        private PersonResponse ConvertPersonToPersonResponse(Person person)
-        {
-            PersonResponse personResponse = person.ToPersonResponse();
-            personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName;
-            return personResponse;
-        }
-
-        #endregion Convert Methods
-
         #region Add Methods
 
-        public PersonResponse AddPerson(PersonAddRequest? personAddRequest)
+        public async Task<PersonResponse> AddPerson(PersonAddRequest? personAddRequest)
         {
             // Validation: personAddRequest parameter can't be null
             if (personAddRequest == null)
@@ -158,39 +54,49 @@ namespace Services
 
             person.PersonID = Guid.NewGuid();
 
-            _persons.Add(person);
+            _db.Persons.Add(person);
+            await _db.SaveChangesAsync();
 
-            return ConvertPersonToPersonResponse(person);
+            //_db.sp_InsertPerson(person);
+
+            return person.ToPersonResponse();
         }
 
         #endregion Add Methods
 
         #region Get Methods
 
-        public List<PersonResponse> GetAllPersons()
+        public async Task<List<PersonResponse>> GetAllPersons()
         {
-            return _persons.Select(temp => ConvertPersonToPersonResponse(temp))
-                .ToList();
+            // SELECT * from Persons
+            var persons = await _db.Persons.Include("Country").ToListAsync();
+
+            return persons
+               .Select(temp => temp.ToPersonResponse())
+               .ToList();
+
+            //return _db.sp_GetAllPersons().Select(temp => temp.ToPersonResponse()).ToList();
         }
 
-        public PersonResponse? GetPersonByPersonID(Guid? personID)
+        public async Task<PersonResponse?> GetPersonByPersonID(Guid? personID)
         {
             if (personID == null)
                 return null;
 
-            Person? person = _persons.FirstOrDefault(temp => temp.PersonID == personID);
+            Person? person = await _db.Persons.Include("Country")
+                .FirstOrDefaultAsync(temp => temp.PersonID == personID);
 
             if (person == null)
                 return null;
 
-            return ConvertPersonToPersonResponse(person);
+            return person.ToPersonResponse();
         }
 
-        public List<PersonResponse> GetFilteredPersons(
+        public async Task<List<PersonResponse>> GetFilteredPersons(
             string searchBy,
             string? searchString)
         {
-            List<PersonResponse> allPersons = GetAllPersons();
+            List<PersonResponse> allPersons = await GetAllPersons();
             List<PersonResponse> matchingPersons = allPersons;
 
             if (string.IsNullOrEmpty(searchBy) || string.IsNullOrEmpty(searchString))
@@ -243,7 +149,7 @@ namespace Services
             return matchingPersons;
         }
 
-        public List<PersonResponse> GetSortedPersons(
+        public async Task<List<PersonResponse>> GetSortedPersons(
             List<PersonResponse> allPersons,
             string sortBy,
             SortOrderOptions sortOrder)
@@ -295,14 +201,15 @@ namespace Services
 
         #region Update Methods
 
-        public PersonResponse UpdatePerson(PersonUpdateRequest? personUpdateRequest)
+        public async Task<PersonResponse> UpdatePerson(PersonUpdateRequest? personUpdateRequest)
         {
             if (personUpdateRequest == null)
                 throw new ArgumentNullException(nameof(personUpdateRequest));
 
             ValidationHelper.ModelValidation(personUpdateRequest);
 
-            Person? matchingPerson = _persons.FirstOrDefault(temp => temp.PersonID == personUpdateRequest.PersonID);
+            Person? matchingPerson = await _db.Persons
+                .FirstOrDefaultAsync(temp => temp.PersonID == personUpdateRequest.PersonID);
 
             if (matchingPerson == null)
                 throw new ArgumentException("Person not found");
@@ -315,30 +222,148 @@ namespace Services
             matchingPerson.Address = personUpdateRequest.Address;
             matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
-            return ConvertPersonToPersonResponse(matchingPerson);
+            await _db.SaveChangesAsync(); // UPDATE
+
+            return matchingPerson.ToPersonResponse();
         }
 
         #endregion Update Methods
 
         #region Delete Methods
 
-        public bool DeletePerson(Guid? personID)
+        public async Task<bool> DeletePerson(Guid? personID)
         {
             if (personID == null)
             {
                 throw new ArgumentNullException(nameof(personID));
             }
 
-            Person? person = _persons.FirstOrDefault(temp => temp.PersonID == personID);
+            Person? person = await _db.Persons
+                .FirstOrDefaultAsync(temp => temp.PersonID == personID);
 
             if (person == null)
                 return false;
 
-            _persons.RemoveAll(temp => temp.PersonID == personID);
+            _db.Persons.Remove(_db.Persons.First(temp => temp.PersonID == personID));
+            await _db.SaveChangesAsync();
 
             return true;
         }
 
         #endregion Delete Methods
+
+        #region Export Methods
+
+        public async Task<MemoryStream> GetPersonsCSV()
+        {
+            var memoryStream = new MemoryStream();
+            var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
+
+            // Wrap both the StreamWriter and CsvWriter in using blocks
+            using (var streamWriter = new StreamWriter(
+                stream: memoryStream,
+                encoding: System.Text.Encoding.UTF8,
+                bufferSize: 1024,
+                leaveOpen: true))
+            using (var csvWriter = new CsvWriter(
+                writer: streamWriter,
+                csvConfiguration))
+            {
+                // Write header
+                csvWriter.WriteField(nameof(PersonResponse.PersonName));
+                csvWriter.WriteField(nameof(PersonResponse.Email));
+                csvWriter.WriteField(nameof(PersonResponse.DateOfBirth));
+                csvWriter.WriteField(nameof(PersonResponse.Age));
+                csvWriter.WriteField(nameof(PersonResponse.Gender));
+                csvWriter.WriteField(nameof(PersonResponse.Country));
+                csvWriter.WriteField(nameof(PersonResponse.Address));
+                csvWriter.WriteField(nameof(PersonResponse.ReceiveNewsLetters));
+
+                csvWriter.NextRecord();
+
+                // Fetch data
+                List<PersonResponse> persons = _db.Persons
+                    .Include(p => p.Country) // Use lambda instead of a string literal
+                    .Select(p => p.ToPersonResponse())
+                    .ToList();
+
+                foreach (PersonResponse person in persons)
+                {
+                    csvWriter.WriteField(person.PersonName);
+                    csvWriter.WriteField(person.Email);
+                    if (person.DateOfBirth != null)
+                    {
+                        csvWriter.WriteField(person.DateOfBirth.Value.ToString("yyy-MM-dd"));
+                    }
+                    else
+                        csvWriter.WriteField("");
+                    csvWriter.WriteField(person.Age);
+                    csvWriter.WriteField(person.Gender);
+                    csvWriter.WriteField(person.Country);
+                    csvWriter.WriteField(person.Address);
+                    csvWriter.WriteField(person.ReceiveNewsLetters);
+                    csvWriter.NextRecord();
+                    csvWriter.Flush();
+                }
+            } // Disposal of csvWriter and streamWriter automatically flushes them
+
+            // Reset position
+            memoryStream.Position = 0;
+
+            return memoryStream;
+        }
+
+        public async Task<MemoryStream> GetPersonsExcel()
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            using (ExcelPackage excelPackage = new ExcelPackage(memoryStream))
+            {
+                ExcelWorksheet workSheet = excelPackage.Workbook.Worksheets.Add("PersonsSheet");
+                workSheet.Cells["A1"].Value = nameof(PersonResponse.PersonName);
+                workSheet.Cells["B1"].Value = nameof(PersonResponse.Email);
+                workSheet.Cells["C1"].Value = nameof(PersonResponse.DateOfBirth);
+                workSheet.Cells["D1"].Value = nameof(PersonResponse.Age);
+                workSheet.Cells["E1"].Value = nameof(PersonResponse.Gender);
+                workSheet.Cells["F1"].Value = nameof(PersonResponse.Country);
+                workSheet.Cells["G1"].Value = nameof(PersonResponse.Address);
+                workSheet.Cells["H1"].Value = nameof(PersonResponse.ReceiveNewsLetters);
+
+                using (ExcelRange headerCells = workSheet.Cells["A1:H1"])
+                {
+                    headerCells.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    headerCells.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+
+                    headerCells.Style.Font.Bold = true;
+                }
+
+                int row = 2;
+                List<PersonResponse> persons = _db.Persons.Include("Country").Select(temp => temp.ToPersonResponse()).ToList();
+
+                foreach (PersonResponse person in persons)
+                {
+                    workSheet.Cells[row, 1].Value = person.PersonName;
+                    workSheet.Cells[row, 2].Value = person.Email;
+
+                    if (person.DateOfBirth.HasValue)
+                        workSheet.Cells[row, 3].Value = person.DateOfBirth.Value.ToString("yyyy-MM-dd");
+                    workSheet.Cells[row, 4].Value = person.Age;
+                    workSheet.Cells[row, 5].Value = person.Gender;
+                    workSheet.Cells[row, 6].Value = person.Country;
+                    workSheet.Cells[row, 7].Value = person.Address;
+                    workSheet.Cells[row, 8].Value = person.ReceiveNewsLetters;
+
+                    row++;
+                }
+
+                workSheet.Cells[$"A1:H{row}"].AutoFitColumns();
+
+                await excelPackage.SaveAsync();
+
+                memoryStream.Position = 0;
+                return memoryStream;
+            }
+        }
+
+        #endregion Export Methods
     }
 }

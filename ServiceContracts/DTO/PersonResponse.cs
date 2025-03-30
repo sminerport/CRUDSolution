@@ -102,7 +102,8 @@ namespace ServiceContracts.DTO
                 CountryID = person.CountryID,
                 Address = person.Address,
                 ReceiveNewsLetters = person.ReceiveNewsLetters,
-                Age = (person.DateOfBirth.HasValue) ? Math.Round((DateTime.Now - person.DateOfBirth.Value).TotalDays / 365.25) : null
+                Age = (person.DateOfBirth.HasValue) ? Math.Round((DateTime.Now - person.DateOfBirth.Value).TotalDays / 365.25) : null,
+                Country = person.Country?.CountryName
             };
         }
     }
