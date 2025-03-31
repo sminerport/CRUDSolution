@@ -21,7 +21,7 @@ namespace Services
     {
         #region Fields
 
-        private PersonsDbContext _db;
+        private ApplicationDbContext _db;
         private readonly ICountriesService _countriesService;
 
         #endregion Fields
@@ -29,7 +29,7 @@ namespace Services
         #region Constructors
 
         public PersonsService(
-            PersonsDbContext personDbContext,
+            ApplicationDbContext personDbContext,
             ICountriesService countriesService)
         {
             _db = personDbContext;
@@ -57,7 +57,7 @@ namespace Services
             _db.Persons.Add(person);
             await _db.SaveChangesAsync();
 
-            //_db.sp_InsertPerson(person);
+            //_countriesRepository.sp_InsertPerson(person);
 
             return person.ToPersonResponse();
         }
@@ -75,7 +75,7 @@ namespace Services
                .Select(temp => temp.ToPersonResponse())
                .ToList();
 
-            //return _db.sp_GetAllPersons().Select(temp => temp.ToPersonResponse()).ToList();
+            //return _countriesRepository.sp_GetAllPersons().Select(temp => temp.ToPersonResponse()).ToList();
         }
 
         public async Task<PersonResponse?> GetPersonByPersonID(Guid? personID)

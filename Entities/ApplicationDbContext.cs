@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Entities
 {
-    public class PersonsDbContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
         #region Constructors
 
-        public PersonsDbContext(DbContextOptions<PersonsDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
@@ -15,8 +15,8 @@ namespace Entities
 
         #region Properties
 
-        public DbSet<Country> Countries { get; set; }
-        public DbSet<Person> Persons { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
+        public virtual DbSet<Person> Persons { get; set; }
 
         #endregion Properties
 
