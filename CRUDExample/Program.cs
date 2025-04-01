@@ -5,11 +5,18 @@ using Entities;
 using Services;
 using OfficeOpenXml;
 
+using RepositoryContracts;
+using Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 ExcelPackage.License.SetNonCommercialPersonal("Scott Miner");
 
 builder.Services.AddControllersWithViews();
+
+// add services into IoC container
+builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
+builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IPersonsService, PersonsService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

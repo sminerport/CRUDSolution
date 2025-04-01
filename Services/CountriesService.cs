@@ -28,31 +28,25 @@ namespace Services
 
         public async Task<CountryResponse> AddCountry(CountryAddRequest? countryAddRequest)
         {
-            // Validation: countryAddRequest parameter can't be null
             if (countryAddRequest == null)
             {
                 throw new ArgumentNullException(nameof(countryAddRequest));
             }
 
-            // Validation: CountryName can't be null
             if (countryAddRequest.CountryName == null)
             {
                 throw new ArgumentException(nameof(countryAddRequest.CountryName));
             }
 
-            // Validation: CountryName should be unique
             if (await _countriesRepository.GetCountryByCountryName(countryAddRequest.CountryName) != null)
             {
                 throw new ArgumentException("Given country name already exists");
             }
 
-            // Convert object from CountryAddRequest to Country type
             Country country = countryAddRequest.ToCountry();
 
-            // Generate CountryID
             country.CountryID = Guid.NewGuid();
 
-            // Add country object into _countriesRepository
             await _countriesRepository.AddCountry(country);
 
             return country.ToCountryResponse();
@@ -65,15 +59,14 @@ namespace Services
         public async Task<List<CountryResponse>> GetAllCountries()
         {
             return (await _countriesRepository.GetAllCountries())
-                .Select(country => country.ToCountryResponse()).ToList();
+                .Select(country => country.ToCountryResponse())
+                .ToList();
         }
 
         public async Task<CountryResponse?> GetCountryByCountryID(Guid? countryID)
         {
             if (countryID == null)
-            {
                 return null;
-            }
 
             Country? country = await _countriesRepository.GetCountryByCountryID(countryID.Value);
 

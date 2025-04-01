@@ -53,7 +53,8 @@ namespace Repositories
 
         public async Task<Person> UpdatePerson(Person person)
         {
-            Person? matchingPerson = await _db.Persons.FirstOrDefaultAsync(person => person.PersonID == person.PersonID);
+            Person? matchingPerson = await _db.Persons
+                .FirstOrDefaultAsync(person => person.PersonID == person.PersonID);
 
             if (matchingPerson == null)
                 return person;
