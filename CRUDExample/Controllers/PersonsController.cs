@@ -23,7 +23,9 @@ namespace CRUDExample.Controllers
 
         #region Constructors
 
-        public PersonsController(IPersonsService personsService, ICountriesService countriesService)
+        public PersonsController(
+            IPersonsService personsService,
+            ICountriesService countriesService)
         {
             _personsService = personsService;
             _countriesService = countriesService;
@@ -87,7 +89,7 @@ namespace CRUDExample.Controllers
                 List<CountryResponse> countries = await _countriesService.GetAllCountries();
                 ViewBag.Countries = countries;
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return View();
+                return View(personAddRequest);
             }
 
             PersonResponse personResponse = await _personsService.AddPerson(personAddRequest);
