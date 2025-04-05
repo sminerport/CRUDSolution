@@ -5,6 +5,7 @@ using CRUDExample.Controllers;
 using FluentAssertions;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 using Moq;
 
@@ -18,9 +19,11 @@ namespace CRUDTests
     {
         private readonly IPersonsService _personsService;
         private readonly ICountriesService _countriesService;
+        private readonly ILogger<PersonsController> _logger;
 
         private readonly Mock<ICountriesService> _countriesServiceMock;
         private readonly Mock<IPersonsService> _personsServiceMock;
+        private readonly Mock<ILogger<PersonsController>> _loggerMock;
 
         private readonly Fixture _fixture;
 
@@ -30,9 +33,11 @@ namespace CRUDTests
 
             _countriesServiceMock = new Mock<ICountriesService>();
             _personsServiceMock = new Mock<IPersonsService>();
+            _loggerMock = new Mock<ILogger<PersonsController>>();
 
             _countriesService = _countriesServiceMock.Object;
             _personsService = _personsServiceMock.Object;
+            _logger = _loggerMock.Object;
         }
 
         #region Index
@@ -45,7 +50,8 @@ namespace CRUDTests
 
             PersonsController personsController = new PersonsController(
                 _personsService,
-                _countriesService);
+                _countriesService,
+                _logger);
 
             _personsServiceMock
                 .Setup(temp => temp.GetFilteredPersons(
@@ -79,7 +85,7 @@ namespace CRUDTests
         #region Create
 
         [Fact]
-        public async Task Create_IfModelErrors_ToReturnCreateView()
+        public async Task Create_IfNoModelErrors_ToReturnRedirectToIndex()
         {
             // Arrange
             PersonAddRequest person_add_request = _fixture.Create<PersonAddRequest>();
@@ -98,43 +104,8 @@ namespace CRUDTests
 
             PersonsController personsController = new PersonsController(
                 _personsService,
-                _countriesService);
-
-            // Act
-            personsController.ModelState.AddModelError(
-                "PersonName",
-                "Person Name can't be blank");
-
-            IActionResult result = await personsController.Create(person_add_request);
-
-            // Assert
-            ViewResult viewResult = Assert.IsType<ViewResult>(result);
-
-            viewResult.ViewData.Model.Should().BeAssignableTo<PersonAddRequest>();
-            viewResult.ViewData.Model.Should().BeEquivalentTo(person_add_request);
-        }
-
-        [Fact]
-        public async void Create_IfNoModelErrors_ToReturnRedirectToIndex()
-        {
-            // Arrange
-            PersonAddRequest person_add_request = _fixture.Create<PersonAddRequest>();
-
-            PersonResponse person_response = _fixture.Create<PersonResponse>();
-
-            List<CountryResponse> countries = _fixture.Create<List<CountryResponse>>();
-
-            _countriesServiceMock
-                .Setup(temp => temp.GetAllCountries())
-                .ReturnsAsync(countries);
-
-            _personsServiceMock
-                .Setup(temp => temp.AddPerson(It.IsAny<PersonAddRequest>()))
-                .ReturnsAsync(person_response);
-
-            PersonsController personsController = new PersonsController(
-                _personsService,
-                _countriesService);
+                _countriesService,
+                _logger);
 
             // Act
             IActionResult result = await personsController.Create(person_add_request);

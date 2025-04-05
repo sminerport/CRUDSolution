@@ -7,38 +7,45 @@ using OfficeOpenXml;
 
 using RepositoryContracts;
 using Repositories;
+using Serilog;
+using CRUDExample.Filters.ActionFilters;
+using CRUDExample.Filters.PersonsListResultFilter;
+using CRUDExample;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ExcelPackage.License.SetNonCommercialPersonal("Scott Miner");
-
-builder.Services.AddControllersWithViews();
-
-// add services into IoC container
-builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
-builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
-builder.Services.AddScoped<ICountriesService, CountriesService>();
-builder.Services.AddScoped<IPersonsService, PersonsService>();
-
-if (!builder.Environment.IsEnvironment("Test"))
+builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, LoggerConfiguration loggerConfiguration) =>
 {
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    });
-}
+    loggerConfiguration
+    .ReadFrom.Configuration(context.Configuration) // read configuration settings from built-in IConfiguration
+    .ReadFrom.Services(services); // read current app's services and make them available to serilog
+});
 
+builder.Services.ConfigureServices(builder.Configuration, builder.Environment);
+
+ExcelPackage.License.SetNonCommercialPersonal("Scott Miner");
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 if (builder.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 
+app.UseHttpLogging();
+
 if (builder.Environment.IsEnvironment("Test") == false)
 {
     Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", "Rotativa");
 }
+
+//app.Logger.LogDebug("debug-message");
+//app.Logger.LogInformation("information-message");
+//app.Logger.LogWarning("warning-message");
+//app.Logger.LogError("error-message");
+//app.Logger.LogCritical("critical-message");
+
 app.UseStaticFiles();
 app.UseRouting();
 app.MapControllers();

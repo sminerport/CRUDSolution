@@ -5,11 +5,15 @@ using CsvHelper.Configuration;
 
 using Entities;
 
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using OfficeOpenXml;
 
 using RepositoryContracts;
+
+using Serilog;
+
+using SerilogTimings;
 
 using ServiceContracts;
 using ServiceContracts.DTO;
@@ -23,15 +27,22 @@ namespace Services
     {
         #region Fields
 
-        private IPersonsRepository _personsRepository;
+        private readonly IPersonsRepository _personsRepository;
+        private readonly ILogger<PersonsService> _logger;
+        private readonly IDiagnosticContext _diagnosticContext;
 
         #endregion Fields
 
         #region Constructors
 
-        public PersonsService(IPersonsRepository personsRepository)
+        public PersonsService(
+            IPersonsRepository personsRepository,
+            ILogger<PersonsService> logger,
+            IDiagnosticContext diagnosticContext)
         {
             _personsRepository = personsRepository;
+            _logger = logger;
+            _diagnosticContext = diagnosticContext;
         }
 
         #endregion Constructors
@@ -61,6 +72,7 @@ namespace Services
 
         public async Task<List<PersonResponse>> GetAllPersons()
         {
+            _logger.LogInformation("GetAllPersons of PersonsService");
             var persons = await _personsRepository.GetAllPersons();
 
             return persons
@@ -85,34 +97,43 @@ namespace Services
             string searchBy,
             string? searchString)
         {
-            List<Person> persons = searchBy switch
+            _logger.LogInformation("{MethodName} of {ClassName}", nameof(GetFilteredPersons), nameof(PersonsService));
+
+            List<Person> persons;
+
+            using (Operation.Time("Time for Filtered Persons from Database"))
             {
-                nameof(PersonResponse.PersonName) =>
-                    await _personsRepository.GetFilteredPersons(temp =>
-                        temp.PersonName.Contains(searchString)),
+                persons = searchBy switch
+                {
+                    nameof(PersonResponse.PersonName) =>
+                        await _personsRepository.GetFilteredPersons(temp =>
+                            temp.PersonName.Contains(searchString)),
 
-                nameof(PersonResponse.Email) =>
-                    await _personsRepository.GetFilteredPersons(temp =>
-                        temp.Email.Contains(searchString)),
+                    nameof(PersonResponse.Email) =>
+                        await _personsRepository.GetFilteredPersons(temp =>
+                            temp.Email.Contains(searchString)),
 
-                nameof(PersonResponse.DateOfBirth) =>
-                    await _personsRepository.GetFilteredPersons(temp =>
-                        temp.DateOfBirth.Value.ToString("MM/dd/YYYY").Contains(searchString)),
+                    nameof(PersonResponse.DateOfBirth) =>
+                        await _personsRepository.GetFilteredPersons(temp =>
+                            temp.DateOfBirth.Value.ToString("MM/dd/YYYY").Contains(searchString)),
 
-                nameof(PersonResponse.Gender) =>
-                    await _personsRepository.GetFilteredPersons(temp =>
-                        temp.Gender.Contains(searchString)),
+                    nameof(PersonResponse.Gender) =>
+                        await _personsRepository.GetFilteredPersons(temp =>
+                            temp.Gender.Contains(searchString)),
 
-                nameof(PersonResponse.CountryID) =>
-                    await _personsRepository.GetFilteredPersons(temp =>
-                        temp.Country.CountryName.Contains(searchString)),
+                    nameof(PersonResponse.CountryID) =>
+                        await _personsRepository.GetFilteredPersons(temp =>
+                            temp.Country.CountryName.Contains(searchString)),
 
-                nameof(PersonResponse.Address) =>
-                    await _personsRepository.GetFilteredPersons(temp =>
-                        temp.Address.Contains(searchString)),
+                    nameof(PersonResponse.Address) =>
+                        await _personsRepository.GetFilteredPersons(temp =>
+                            temp.Address.Contains(searchString)),
 
-                _ => await _personsRepository.GetAllPersons()
-            };
+                    _ => await _personsRepository.GetAllPersons()
+                };
+            }
+
+            _diagnosticContext.Set("Persons", persons);
 
             return persons.Select(temp => temp.ToPersonResponse()).ToList();
         }
@@ -122,6 +143,7 @@ namespace Services
             string sortBy,
             SortOrderOptions sortOrder)
         {
+            _logger.LogInformation("{MethodName} of {ClassName}", nameof(PersonsService), nameof(GetSortedPersons));
             if (string.IsNullOrEmpty(sortBy))
                 return allPersons;
 

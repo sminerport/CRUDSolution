@@ -9,10 +9,13 @@ using EntityFrameworkCoreMock;
 using FluentAssertions;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using Moq;
 
 using RepositoryContracts;
+
+using Serilog;
 
 using ServiceContracts;
 using ServiceContracts.DTO;
@@ -33,6 +36,10 @@ namespace CRUDTests
         private readonly Mock<IPersonsRepository> _personsRepositoryMock;
         private readonly ITestOutputHelper _testOutputHelper;
         private readonly IFixture _fixture;
+        private readonly ILogger<PersonsService> _logger;
+        private readonly Mock<ILogger<PersonsService>> _loggerMock;
+        private readonly IDiagnosticContext _diagnosticContext;
+        private readonly Mock<IDiagnosticContext> _diagnosticContextMock;
 
         #endregion Fields
 
@@ -43,8 +50,16 @@ namespace CRUDTests
             _fixture = new Fixture();
             _personsRepositoryMock = new Mock<IPersonsRepository>();
             _personsRepository = _personsRepositoryMock.Object;
+            _loggerMock = new Mock<ILogger<PersonsService>>();
+            _diagnosticContextMock = new Mock<IDiagnosticContext>();
 
-            _personsService = new PersonsService(_personsRepository);
+            _diagnosticContext = _diagnosticContextMock.Object;
+            _logger = _loggerMock.Object;
+
+            _personsService = new PersonsService(
+                _personsRepository,
+                _logger,
+                _diagnosticContext);
             _testOutputHelper = testOutputHelper;
         }
 

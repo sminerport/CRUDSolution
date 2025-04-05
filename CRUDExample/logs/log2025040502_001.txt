@@ -1,0 +1,75 @@
+2025-04-05 02:22:12.772 -06:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-04-05 02:22:12.801 -06:00 [INF] Hosting environment: Development
+2025-04-05 02:22:12.805 -06:00 [INF] Content root path: C:\WindowsCode\CrudSolution\CRUDExample
+2025-04-05 02:26:13.061 -06:00 [INF] User profile is available. Using 'C:\Users\Scott\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-04-05 02:26:14.437 -06:00 [INF] Now listening on: http://localhost:5217
+2025-04-05 02:26:16.447 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/_framework/aspnetcore-browser-refresh.js - null null
+2025-04-05 02:26:16.536 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/_vs/browserLink - null null
+2025-04-05 02:26:17.482 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/_framework/aspnetcore-browser-refresh.js - 200 16507 application/javascript; charset=utf-8 1055.365ms
+2025-04-05 02:26:17.834 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/_vs/browserLink - 200 null text/javascript; charset=UTF-8 1300.1425ms
+2025-04-05 02:26:42.419 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/ - null null
+2025-04-05 02:26:42.549 -06:00 [INF] Request:
+Protocol: HTTP/1.1
+Method: GET
+Scheme: http
+PathBase: 
+Path: /
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Connection: keep-alive
+Host: localhost:5217
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+Cache-Control: max-age=0
+Cookie: [Redacted]
+If-Modified-Since: [Redacted]
+Referer: [Redacted]
+Upgrade-Insecure-Requests: [Redacted]
+sec-ch-ua: [Redacted]
+sec-ch-ua-mobile: [Redacted]
+sec-ch-ua-platform: [Redacted]
+DNT: 1
+Sec-Fetch-Site: [Redacted]
+Sec-Fetch-Mode: [Redacted]
+Sec-Fetch-Dest: [Redacted]
+2025-04-05 02:26:42.604 -06:00 [INF] Executing endpoint 'CRUDExample.Controllers.PersonsController.Index (CRUDExample)'
+2025-04-05 02:26:42.726 -06:00 [INF] Route matched with {action = "Index", controller = "Persons"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index(System.String, System.String, System.String, ServiceContracts.Enums.SortOrderOptions) on controller CRUDExample.Controllers.PersonsController (CRUDExample).
+2025-04-05 02:26:43.118 -06:00 [INF] ResponseHeaderActionFilter.OnActionExecutionAsync - before
+2025-04-05 02:26:43.128 -06:00 [INF] ResponseHeaderActionFilter.OnActionExecutionAsync - before
+2025-04-05 02:26:43.135 -06:00 [INF] ResponseHeaderActionFilter.OnActionExecutionAsync - before
+2025-04-05 02:26:43.140 -06:00 [INF] PersonsListActionFilter.OnActionExecuting method
+2025-04-05 02:26:43.149 -06:00 [INF] Index action method of PersonsController
+2025-04-05 02:26:43.164 -06:00 [INF] GetFilteredPersons of PersonsService
+2025-04-05 02:26:43.171 -06:00 [INF] GetAllPersons of PersonsRepository
+2025-04-05 02:26:45.064 -06:00 [INF] Executed DbCommand (21ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [p].[PersonID], [p].[Address], [p].[CountryID], [p].[DateOfBirth], [p].[Email], [p].[Gender], [p].[PersonName], [p].[ReceiveNewsLetters], [p].[TaxIdentificationNumber], [c].[CountryID], [c].[CountryName]
+FROM [Persons] AS [p]
+LEFT JOIN [Countries] AS [c] ON [p].[CountryID] = [c].[CountryID]
+2025-04-05 02:26:45.247 -06:00 [INF] Time for Filtered Persons from Database completed in 2077.2 ms
+2025-04-05 02:26:45.269 -06:00 [INF] PersonsService of GetSortedPersons
+2025-04-05 02:26:45.292 -06:00 [INF] PersonsListActionFilter.OnActionExecuted method
+2025-04-05 02:26:45.369 -06:00 [INF] ResponseHeaderActionFilter.OnActionExecutionAsync - after
+2025-04-05 02:26:45.373 -06:00 [INF] ResponseHeaderActionFilter.OnActionExecutionAsync - after
+2025-04-05 02:26:45.377 -06:00 [INF] ResponseHeaderActionFilter.OnActionExecutionAsync - after
+2025-04-05 02:26:45.389 -06:00 [INF] PersonsListResultFilter.OnResultExecutionAsync - before
+2025-04-05 02:26:45.411 -06:00 [INF] Executing ViewResult, running view Index.
+2025-04-05 02:26:45.715 -06:00 [INF] Executed ViewResult - view Index executed in 306.3528ms.
+2025-04-05 02:26:45.731 -06:00 [INF] PersonsListResultFilter.OnResultExecutionAsync - after
+2025-04-05 02:26:45.746 -06:00 [INF] Executed action CRUDExample.Controllers.PersonsController.Index (CRUDExample) in 2996.746ms
+2025-04-05 02:26:45.752 -06:00 [INF] Executed endpoint 'CRUDExample.Controllers.PersonsController.Index (CRUDExample)'
+2025-04-05 02:26:45.757 -06:00 [INF] Response:
+StatusCode: 200
+Content-Type: text/html; charset=utf-8
+Date: Sat, 05 Apr 2025 08:26:44 GMT
+Server: Kestrel
+Last-Modified: 2025-04-05 02:26
+Transfer-Encoding: chunked
+X-From-Global-Filter: [Redacted]
+X-Action-Filter-Key: [Redacted]
+Controller-Filter-Key: [Redacted]
+2025-04-05 02:26:45.769 -06:00 [INF] HTTP GET / responded 200 in 3255.7593 ms
+2025-04-05 02:26:45.800 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/ - 200 null text/html; charset=utf-8 3380.1419ms
+2025-04-05 02:26:45.809 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/_framework/aspnetcore-browser-refresh.js - null null
+2025-04-05 02:26:45.818 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/_framework/aspnetcore-browser-refresh.js - 200 16507 application/javascript; charset=utf-8 8.7859ms
+2025-04-05 02:26:45.870 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/_vs/browserLink - null null
+2025-04-05 02:26:46.006 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/_vs/browserLink - 200 null text/javascript; charset=UTF-8 136.7017ms

@@ -1,0 +1,54 @@
+2025-04-04 01:24:27.835 -06:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-04-04 01:24:27.905 -06:00 [INF] Hosting environment: Production
+2025-04-04 01:24:27.975 -06:00 [INF] Content root path: C:\WindowsCode\CrudSolution\CRUDExample
+2025-04-04 01:38:26.616 -06:00 [INF] User profile is available. Using 'C:\Users\Scott\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-04-04 01:38:27.595 -06:00 [INF] Now listening on: http://localhost:5217
+2025-04-04 01:38:30.535 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/_vs/browserLink - null null
+2025-04-04 01:38:30.539 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/_framework/aspnetcore-browser-refresh.js - null null
+2025-04-04 01:38:37.298 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/_framework/aspnetcore-browser-refresh.js - 200 16507 application/javascript; charset=utf-8 6779.6025ms
+2025-04-04 01:38:38.441 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/_vs/browserLink - 200 null text/javascript; charset=UTF-8 7926.6972ms
+2025-04-04 01:41:37.159 -06:00 [INF] Request starting HTTP/1.1 GET http://localhost:5217/ - null null
+2025-04-04 01:41:37.520 -06:00 [INF] Request:
+Protocol: HTTP/1.1
+Method: GET
+Scheme: http
+PathBase: 
+Path: /
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Connection: keep-alive
+Host: localhost:5217
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-US,en;q=0.9
+Cache-Control: max-age=0
+Cookie: [Redacted]
+If-Modified-Since: [Redacted]
+Upgrade-Insecure-Requests: [Redacted]
+sec-ch-ua: [Redacted]
+sec-ch-ua-mobile: [Redacted]
+sec-ch-ua-platform: [Redacted]
+DNT: 1
+Sec-Fetch-Site: [Redacted]
+Sec-Fetch-Mode: [Redacted]
+Sec-Fetch-User: [Redacted]
+Sec-Fetch-Dest: [Redacted]
+2025-04-04 01:41:37.649 -06:00 [INF] Executing endpoint 'CRUDExample.Controllers.PersonsController.Index (CRUDExample)'
+2025-04-04 01:41:38.094 -06:00 [INF] Executed endpoint 'CRUDExample.Controllers.PersonsController.Index (CRUDExample)'
+2025-04-04 01:41:38.122 -06:00 [INF] Response:
+StatusCode: 200
+2025-04-04 01:41:38.149 -06:00 [ERR] HTTP GET / responded 500 in 661.3614 ms
+System.InvalidOperationException: No service for type 'CRUDExample.Filters.PersonsListResultFilter.PersonsListResultFilter' has been registered.
+   at Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)
+   at Microsoft.AspNetCore.Mvc.ServiceFilterAttribute.CreateInstance(IServiceProvider serviceProvider)
+   at Microsoft.AspNetCore.Mvc.Filters.DefaultFilterProvider.ProvideFilter(FilterProviderContext context, FilterItem filterItem)
+   at Microsoft.AspNetCore.Mvc.Filters.DefaultFilterProvider.OnProvidersExecuting(FilterProviderContext context)
+   at Microsoft.AspNetCore.Mvc.Filters.FilterFactory.CreateUncachedFiltersCore(IFilterProvider[] filterProviders, ActionContext actionContext, List`1 filterItems)
+   at Microsoft.AspNetCore.Mvc.Filters.FilterFactory.GetAllFilters(IFilterProvider[] filterProviders, ActionContext actionContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvokerCache.GetCachedResult(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Routing.ControllerRequestDelegateFactory.<>c__DisplayClass12_0.<CreateRequestDelegate>b__0(HttpContext context)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware.InvokeInternal(HttpContext context, HttpLoggingOptions options, HttpLoggingAttribute loggingAttribute, HttpLoggingFields loggingFields)
+   at Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware.InvokeInternal(HttpContext context, HttpLoggingOptions options, HttpLoggingAttribute loggingAttribute, HttpLoggingFields loggingFields)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2025-04-04 01:41:39.189 -06:00 [INF] Request finished HTTP/1.1 GET http://localhost:5217/ - 500 0 null 2030.3622ms
