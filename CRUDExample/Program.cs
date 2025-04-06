@@ -11,6 +11,7 @@ using Serilog;
 using CRUDExample.Filters.ActionFilters;
 using CRUDExample.Filters.PersonsListResultFilter;
 using CRUDExample;
+using CRUDExample.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,14 +25,20 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, 
 builder.Services.ConfigureServices(builder.Configuration, builder.Environment);
 
 ExcelPackage.License.SetNonCommercialPersonal("Scott Miner");
-var app = builder.Build();
 
-app.UseSerilogRequestLogging();
+var app = builder.Build();
 
 if (builder.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandlingMiddleware();
+}
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpLogging();
 

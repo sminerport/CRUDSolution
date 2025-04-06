@@ -5,6 +5,8 @@ using CsvHelper.Configuration;
 
 using Entities;
 
+using Exceptions;
+
 using Microsoft.Extensions.Logging;
 
 using OfficeOpenXml;
@@ -23,21 +25,21 @@ using Services.Helpers;
 
 namespace Services
 {
-    public class PersonsService : IPersonsService
+    public class PersonsGetterService : IPersonsGetterService
     {
         #region Fields
 
         private readonly IPersonsRepository _personsRepository;
-        private readonly ILogger<PersonsService> _logger;
+        private readonly ILogger<PersonsGetterService> _logger;
         private readonly IDiagnosticContext _diagnosticContext;
 
         #endregion Fields
 
         #region Constructors
 
-        public PersonsService(
+        public PersonsGetterService(
             IPersonsRepository personsRepository,
-            ILogger<PersonsService> logger,
+            ILogger<PersonsGetterService> logger,
             IDiagnosticContext diagnosticContext)
         {
             _personsRepository = personsRepository;
@@ -47,32 +49,11 @@ namespace Services
 
         #endregion Constructors
 
-        #region Add Methods
-
-        public async Task<PersonResponse> AddPerson(PersonAddRequest? personAddRequest)
-        {
-            // Validation: personAddRequest parameter can't be null
-            if (personAddRequest == null)
-                throw new ArgumentNullException(nameof(personAddRequest));
-
-            ValidationHelper.ModelValidation(personAddRequest);
-
-            Person person = personAddRequest.ToPerson();
-
-            person.PersonID = Guid.NewGuid();
-
-            await _personsRepository.AddPerson(person);
-
-            return person.ToPersonResponse();
-        }
-
-        #endregion Add Methods
-
         #region Get Methods
 
         public async Task<List<PersonResponse>> GetAllPersons()
         {
-            _logger.LogInformation("GetAllPersons of PersonsService");
+            _logger.LogInformation("{MethodName} of {ClassName}", nameof(GetAllPersons), nameof(PersonsGetterService));
             var persons = await _personsRepository.GetAllPersons();
 
             return persons
@@ -97,11 +78,11 @@ namespace Services
             string searchBy,
             string? searchString)
         {
-            _logger.LogInformation("{MethodName} of {ClassName}", nameof(GetFilteredPersons), nameof(PersonsService));
+            _logger.LogInformation("{MethodName} of {ClassName}", nameof(GetFilteredPersons), nameof(PersonsGetterService));
 
             List<Person> persons;
 
-            using (Operation.Time("Time for Filtered Persons from Database"))
+            using (Operation.Time("Time for {MethodName} from Database", nameof(GetFilteredPersons)))
             {
                 persons = searchBy switch
                 {
@@ -138,106 +119,7 @@ namespace Services
             return persons.Select(temp => temp.ToPersonResponse()).ToList();
         }
 
-        public async Task<List<PersonResponse>> GetSortedPersons(
-            List<PersonResponse> allPersons,
-            string sortBy,
-            SortOrderOptions sortOrder)
-        {
-            _logger.LogInformation("{MethodName} of {ClassName}", nameof(PersonsService), nameof(GetSortedPersons));
-            if (string.IsNullOrEmpty(sortBy))
-                return allPersons;
-
-            List<PersonResponse> sortedPersons = (sortBy, sortOrder) switch
-            {
-                (nameof(PersonResponse.PersonName), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.PersonName), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.PersonName, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.Email), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Email, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.Email), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Email, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.DateOfBirth).ToList(),
-
-                (nameof(PersonResponse.DateOfBirth), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.DateOfBirth).ToList(),
-
-                (nameof(PersonResponse.Age), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Age).ToList(),
-
-                (nameof(PersonResponse.Age), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Age).ToList(),
-
-                (nameof(PersonResponse.Gender), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Gender?.ToString(), StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.Gender), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Gender?.ToString(), StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.Country), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Country, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.Country), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Country, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.Address), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.Address, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.Address), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.Address, StringComparer.OrdinalIgnoreCase).ToList(),
-
-                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.ASC) => allPersons.OrderBy(temp => temp.ReceiveNewsLetters).ToList(),
-
-                (nameof(PersonResponse.ReceiveNewsLetters), SortOrderOptions.DESC) => allPersons.OrderByDescending(temp => temp.ReceiveNewsLetters).ToList(),
-
-                _ => allPersons
-            };
-
-            return sortedPersons;
-        }
-
         #endregion Get Methods
-
-        #region Update Methods
-
-        public async Task<PersonResponse> UpdatePerson(PersonUpdateRequest? personUpdateRequest)
-        {
-            if (personUpdateRequest == null)
-                throw new ArgumentNullException(nameof(personUpdateRequest));
-
-            ValidationHelper.ModelValidation(personUpdateRequest);
-
-            Person? matchingPerson = await _personsRepository.GetPersonByPersonID(personUpdateRequest.PersonID);
-
-            if (matchingPerson == null)
-                throw new ArgumentException("Person not found");
-
-            matchingPerson.PersonName = personUpdateRequest.PersonName;
-            matchingPerson.Email = personUpdateRequest.Email;
-            matchingPerson.DateOfBirth = personUpdateRequest.DateOfBirth;
-            matchingPerson.Gender = personUpdateRequest.Gender.ToString();
-            matchingPerson.CountryID = personUpdateRequest.CountryID;
-            matchingPerson.Address = personUpdateRequest.Address;
-            matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
-
-            await _personsRepository.UpdatePerson(matchingPerson);
-
-            return matchingPerson.ToPersonResponse();
-        }
-
-        #endregion Update Methods
-
-        #region Delete Methods
-
-        public async Task<bool> DeletePerson(Guid? personID)
-        {
-            if (personID == null)
-            {
-                throw new ArgumentNullException(nameof(personID));
-            }
-
-            Person? person = await _personsRepository.GetPersonByPersonID(personID.Value);
-
-            if (person == null)
-                return false;
-
-            await _personsRepository.DeletePersonByPersonID(personID.Value);
-
-            return true;
-        }
-
-        #endregion Delete Methods
 
         #region Export Methods
 

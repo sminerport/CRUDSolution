@@ -38,13 +38,13 @@ namespace Repositories
 
         public async Task<List<Person>> GetAllPersons()
         {
-            _logger.LogInformation("GetAllPersons of PersonsRepository");
+            _logger.LogInformation("{MethodName} of {ClassName}", nameof(GetAllPersons), nameof(PersonsRepository));
             return await _db.Persons.Include("Country").ToListAsync();
         }
 
         public async Task<List<Person>> GetFilteredPersons(Expression<Func<Person, bool>> predicate)
         {
-            _logger.LogInformation("GetFilteredPersons of PersonsRepository");
+            _logger.LogInformation("{MethodName} of {ClassName}", nameof(GetFilteredPersons), nameof(GetFilteredPersons));
             return await _db.Persons.Include("Country")
                 .Where(predicate)
                 .ToListAsync();
