@@ -51,7 +51,7 @@ namespace Services
 
         #region Get Methods
 
-        public async Task<List<PersonResponse>> GetAllPersons()
+        public virtual async Task<List<PersonResponse>> GetAllPersons()
         {
             _logger.LogInformation("{MethodName} of {ClassName}", nameof(GetAllPersons), nameof(PersonsGetterService));
             var persons = await _personsRepository.GetAllPersons();
@@ -61,7 +61,7 @@ namespace Services
                .ToList();
         }
 
-        public async Task<PersonResponse?> GetPersonByPersonID(Guid? personID)
+        public virtual async Task<PersonResponse?> GetPersonByPersonID(Guid? personID)
         {
             if (personID == null)
                 return null;
@@ -74,7 +74,7 @@ namespace Services
             return person.ToPersonResponse();
         }
 
-        public async Task<List<PersonResponse>> GetFilteredPersons(
+        public virtual async Task<List<PersonResponse>> GetFilteredPersons(
             string searchBy,
             string? searchString)
         {
@@ -123,7 +123,7 @@ namespace Services
 
         #region Export Methods
 
-        public async Task<MemoryStream> GetPersonsCSV()
+        public virtual async Task<MemoryStream> GetPersonsCSV()
         {
             var memoryStream = new MemoryStream();
             var csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
@@ -177,7 +177,7 @@ namespace Services
             return memoryStream;
         }
 
-        public async Task<MemoryStream> GetPersonsExcel()
+        public virtual async Task<MemoryStream> GetPersonsExcel()
         {
             MemoryStream memoryStream = new MemoryStream();
             using (ExcelPackage excelPackage = new ExcelPackage(memoryStream))
